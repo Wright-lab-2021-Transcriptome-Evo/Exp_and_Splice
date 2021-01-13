@@ -18,6 +18,8 @@ parser.add_argument("infolder", type=str,
                     help="Infolder of sorted bam files on which to run StringTie")
 parser.add_argument("wdpath", type=str,
                     help="Working directory path")
+parser.add_argument("gtf", type=str, 
+                    help="Path to reference GTF")
 # This checks if the user supplied any arguments. If not, help is printed.
 if len(sys.argv) == 1:
     parser.print_help()
@@ -142,7 +144,8 @@ def main():
             outfile.write("source /usr/local/extras/Genomics/.bashrc")
             outfile.write("\n")
             outfile.write("\n")
-            outfile.write("stringtie")
+            outfile.write("stringtie -e -G ")
+            outfile.write(args.gtf)
             outfile.write(" ")
             outfile.write(str(infile))
             outfile.write(" -o ")
