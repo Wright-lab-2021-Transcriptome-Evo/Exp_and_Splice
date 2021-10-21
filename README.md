@@ -29,7 +29,7 @@ You may need to create a salmon environment in conda for this to work
 ```sh
 salmon index -t species_cds.fa -i species_salmon_index
 ```
-[see relevant script here: Step_1_trimmomatic.sh](Scripts/Salmon/Step_1_salmon_index.sh)
+[see relevant script here: Step_1_salmon_index.sh](Scripts/Salmon/Step_1_salmon_index.sh)
 
 ## rMATs 
 ### Step 1 
