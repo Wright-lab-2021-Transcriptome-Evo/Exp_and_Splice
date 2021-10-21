@@ -10,7 +10,7 @@
 #$ -pe smp 4
 
 # Set the working directory
-#$ -wd /fastdata/bop20pp/comp_exp_models/wdir/
+#$ -wd /fastdata/bop20pp/wdir/exp_and_splice
 
 # Run the application.
 # Option 2 are the location of the adapter sequences
