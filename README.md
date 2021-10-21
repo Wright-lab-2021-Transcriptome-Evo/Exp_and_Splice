@@ -23,13 +23,24 @@ rename _sequence.txt.gz .fastq.gz *sequence.txt.gz
 
 # SALMON 
 
-### Step 1
+### Step 1: Salmon Index
 Create species index file from cds sequence 
 You may need to create a salmon environment in conda for this to work 
 ```sh
 salmon index -t species_cds.fa -i species_salmon_index
 ```
 [see relevant script here: Step_1_salmon_index.sh](Scripts/Salmon/Step_1_salmon_index.sh)
+
+### Step 2: Salmon Quantification
+
+Quickly make a directory to store all your species salmon outputs 
+```sh
+for i in sp1 sp2 sp3 sp4; do mkdir /fastdata/bop20pp/exp_and_splice/salmon/${sp1}; done
+```
+
+Look the following script over all the samples for each species in a bash submission for loop (e.g ``` for i in a b c; qsub com.sh $a; done ```)
+
+[see relevant script here: Step_2_salmon_quant.sh](Scripts/Salmon/Step_2_salmon_quant.sh)
 
 ## rMATs 
 ### Step 1 
