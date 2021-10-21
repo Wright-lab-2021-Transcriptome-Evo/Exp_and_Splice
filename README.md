@@ -1,6 +1,6 @@
 # Pipeline for the quantification of expression and splicing using Salmon and rMATS 
 
-## Prep
+# Prep
 
 ### Step 1 
 Trim reads using Trimmomatic using the bellow command
@@ -20,9 +20,16 @@ rename _sequence.txt.gz .fastq.gz *sequence.txt.gz
 ```
 
 [see relevant script here: Step_1_trimmomatic.sh](Scripts/Prep/Step_1_trimmomatic.sh)
-## SALMON 
+
+# SALMON 
 
 ### Step 1
+Create species index file from cds sequence 
+You may need to create a salmon environment in conda for this to work 
+```sh
+salmon index -t species_cds.fa -i species_salmon_index
+```
+[see relevant script here: Step_1_salmon_index.sh](Scripts/Salmon/Step_1_salmon_index.sh)
 
 ## rMATs 
 ### Step 1 
