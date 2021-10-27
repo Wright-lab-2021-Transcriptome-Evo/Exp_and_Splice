@@ -1,6 +1,0 @@
-name: my-env
-channels:
-  - bioconda
-  - defaults
-dependencies:
-  - seqtk

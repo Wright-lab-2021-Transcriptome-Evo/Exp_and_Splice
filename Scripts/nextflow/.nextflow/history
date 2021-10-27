@@ -1,5 +1,0 @@
-2021-10-26 10:17:05	7.5s	zen_marconi	OK	ce7a51e86c5a38343266c5bf24de937a	408ec442-541c-4e09-847f-5e15d067de9f	nextflow main.nf
-2021-10-26 10:17:31	2.7s	adoring_bardeen	OK	ce7a51e86c5a38343266c5bf24de937a	2d7f3d5b-2292-4151-aaad-fa74c0f58965	nextflow main.nf
-2021-10-26 10:18:10	1.8s	clever_leavitt	OK	ce7a51e86c5a38343266c5bf24de937a	2d7f3d5b-2292-4151-aaad-fa74c0f58965	nextflow main.nf -resume
-2021-10-26 17:03:37	3.4s	intergalactic_morse	ERR	ce7a51e86c5a38343266c5bf24de937a	548ab157-704f-4e1e-b529-6a206cefb288	nextflow main.nf
-2021-10-26 17:12:53	2.9s	gloomy_knuth	ERR	d5db3b53f012e06f3a2823697bceb33b	17f6627a-01eb-4f81-bef7-f0b38e1b5c98	nextflow main.nf

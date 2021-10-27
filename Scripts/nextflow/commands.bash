@@ -1,1 +1,0 @@
-nextflow main.nf -resume
