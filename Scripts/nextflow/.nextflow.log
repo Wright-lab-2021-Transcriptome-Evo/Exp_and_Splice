@@ -1,0 +1,77 @@
+Oct-26 17:12:52.432 [main] DEBUG nextflow.cli.Launcher - $> nextflow main.nf
+Oct-26 17:12:52.626 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 21.04.0
+Oct-26 17:12:52.657 [main] INFO  nextflow.cli.CmdRun - Launching `main.nf` [gloomy_knuth] - revision: d5db3b53f0
+Oct-26 17:12:52.679 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /Users/peter/Documents/GitHub/Exp_and_Splice/Scripts/nextflow/nextflow.config
+Oct-26 17:12:52.680 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/peter/Documents/GitHub/Exp_and_Splice/Scripts/nextflow/nextflow.config
+Oct-26 17:12:52.722 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-26 17:12:53.400 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; plugins-dir=/Users/peter/.nextflow/plugins
+Oct-26 17:12:53.402 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-26 17:12:53.404 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins local root: .nextflow/plr/empty
+Oct-26 17:12:53.410 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-26 17:12:53.411 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-26 17:12:53.414 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Oct-26 17:12:53.423 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-26 17:12:53.464 [main] DEBUG nextflow.Session - Session uuid: 17f6627a-01eb-4f81-bef7-f0b38e1b5c98
+Oct-26 17:12:53.464 [main] DEBUG nextflow.Session - Run name: gloomy_knuth
+Oct-26 17:12:53.465 [main] DEBUG nextflow.Session - Executor pool size: 8
+Oct-26 17:12:53.522 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 21.04.0 build 5552
+  Created: 02-05-2021 16:22 UTC (17:22 BST)
+  System: Mac OS X 10.16
+  Runtime: Groovy 3.0.7 on OpenJDK 64-Bit Server VM 11.0.6+8-b765.1
+  Encoding: UTF-8 (UTF-8)
+  Process: 68773@Peters-MBP [192.168.1.28]
+  CPUs: 8 - Mem: 16 GB (17.4 MB) - Swap: 7 GB (755.8 MB)
+Oct-26 17:12:53.539 [main] DEBUG nextflow.Session - Work-dir: /Users/peter/Documents/GitHub/Exp_and_Splice/Scripts/nextflow/work [Mac OS X]
+Oct-26 17:12:53.539 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /Users/peter/Documents/GitHub/Exp_and_Splice/Scripts/nextflow/bin
+Oct-26 17:12:53.551 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-26 17:12:53.570 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Oct-26 17:12:53.684 [main] DEBUG nextflow.Session - Session start invoked
+Oct-26 17:12:54.277 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-26 17:12:54.289 [main] DEBUG nextflow.Session - Workflow process names [dsl1]: trim, salmon_index, salmon_quant
+Oct-26 17:12:54.443 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: trimm_reads/; pattern: *{1,2}.fastq.gz; options: [:]
+Oct-26 17:12:54.560 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: genomes/; pattern: *.gz; options: [:]
+Oct-26 17:12:54.754 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-26 17:12:54.754 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-26 17:12:54.762 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Oct-26 17:12:54.769 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=8; memory=16 GB; capacity=8; pollInterval=100ms; dumpInterval=5m
+Oct-26 17:12:55.116 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-26 17:12:55.118 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-26 17:12:55.208 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Oct-26 17:12:55.208 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-26 17:12:55.215 [main] DEBUG nextflow.script.ScriptRunner - > Await termination 
+Oct-26 17:12:55.216 [main] DEBUG nextflow.Session - Session await
+Oct-26 17:12:55.318 [Task submitter] DEBUG nextflow.executor.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-26 17:12:55.325 [Task submitter] INFO  nextflow.Session - [4e/ec8b22] Submitted process > salmon_index (1)
+Oct-26 17:12:55.634 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: salmon_index (1); status: COMPLETED; exit: 127; error: -; workDir: /Users/peter/Documents/GitHub/Exp_and_Splice/Scripts/nextflow/work/4e/ec8b22582aedc8ad8b7007068b6a04]
+Oct-26 17:12:55.660 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'salmon_index (1)'
+
+Caused by:
+  Process `salmon_index (1)` terminated with an error exit status (127)
+
+Command executed:
+
+  #!/bin/bash
+  #source /usr/local/extras/Genomics/.bashrc
+  source activate salmon
+  salmon index -t goose.cds.fa.gz -i goose_index
+
+Command exit status:
+  127
+
+Command output:
+  (empty)
+
+Command error:
+  .command.sh: line 4: salmon: command not found
+
+Work dir:
+  /Users/peter/Documents/GitHub/Exp_and_Splice/Scripts/nextflow/work/4e/ec8b22582aedc8ad8b7007068b6a04
+
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`
+Oct-26 17:12:55.668 [main] DEBUG nextflow.Session - Session await > all process finished
+Oct-26 17:12:55.669 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Process `salmon_index (1)` terminated with an error exit status (127)
+Oct-26 17:12:55.713 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Oct-26 17:12:55.736 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=1; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=197ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=1; peakMemory=1 GB; ]
+Oct-26 17:12:55.891 [main] DEBUG nextflow.CacheDB - Closing CacheDB done
+Oct-26 17:12:55.910 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

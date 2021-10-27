@@ -1,0 +1,16 @@
+﻿Sample,Species,Sex,Organ
+<<<<<<< HEAD
+a,duck,M,G
+b,duck,F,G
+c,giraffe,M,G
+d,human,F,S
+e,human,F,S
+WTCHG_24918_03,apl,F,G
+WTCHG_24918_02,apl,M,S
+=======
+a,goose,M,G
+b,duck,F,G
+c,giraffe,M,G
+d,human,F,S
+e,alfa,F,S
+>>>>>>> parent of 12619ed (updated and great)
