@@ -91,7 +91,7 @@ ortho_cds = Channel.fromPath(params.cds)
 process ortho_finder {
 
    input:
-   path cds from ortho_cds
+   file(cds) from ortho_cds
 
    output:
 
@@ -99,8 +99,11 @@ process ortho_finder {
    """
    #!/bin/bash
    source /usr/local/extras/Genomics/.bashrc
-   gunzip cds/*
-   ~/software/OrthoFinder/orthofinder -f cds -d 
+   
+   mkdir cds_new
+   cp ${cds}/* cds_new
+   gunzip cds_new/*
+   ~/software/OrthoFinder/orthofinder -f cds_new -d 
    """
 
 }
