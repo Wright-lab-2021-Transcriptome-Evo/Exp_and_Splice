@@ -1,4 +1,4 @@
-reads_ch = Channel.fromFilePairs('trimm_reads/*{1,2}.fastq.gz')
+reads_ch = Channel.fromFilePairs('reads/*{1,2}.fastq.gz')
 params.adapter = 'adapters.fa'
 adapter=file(params.adapter)
 metadata=file('meta_data.csv')
