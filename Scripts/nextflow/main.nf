@@ -64,11 +64,6 @@ process trim {
     """
 }
 
-//t1=channel.from(trimmed1)
-//s1=channel.from(salmon_indexed)
-
-//pre_quant_ch=chanl.from(trimmed1).join(salmon_indexed).view()
-//trimmed1.combine(salmon_indexed, by:0).view()
 
 
 process salmon_quant {
