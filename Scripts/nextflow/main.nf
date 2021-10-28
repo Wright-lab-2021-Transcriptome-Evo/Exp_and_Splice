@@ -89,7 +89,7 @@ process salmon_quant {
 ortho_cds = Channel.fromPath(params.cds)
 	
 process ortho_finder {
-
+  
    input:
    file(cds) from ortho_cds
 
@@ -103,7 +103,9 @@ process ortho_finder {
    mkdir cds_new
    cp ${cds}/* cds_new
    gunzip cds_new/*
-   ~/software/OrthoFinder/orthofinder -f cds_new -d 
+   #~/software/OrthoFinder/orthofinder -f cds_new -d 
+   source activate orthofinder
+   orthofinder -f cds_new -d
    """
 
 }
