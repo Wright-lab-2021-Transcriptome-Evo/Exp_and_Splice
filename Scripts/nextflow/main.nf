@@ -1,6 +1,7 @@
 reads_ch = Channel.fromFilePairs(params.reads + '/*{1,2}.fastq.gz')
 adapter=file(params.adapter)
 metadata=file(params.metadata)
+cdna_ch=Channel.fromPath(params.cdna + '/*.gz')
 cds_ch=Channel.fromPath(params.cds + '/*.gz')
 
 
@@ -12,19 +13,18 @@ process salmon_index {
    publishDir 'salmon_index', mode: 'copy', overwrite: true, pattern: '*index*'
 	      
    input:
-   file(cds) from cds_ch
+   file(cdna) from cdna_ch
 
    output:
    tuple val(species), file("${species}_index") into salmon_indexed
 
    script:
-   species=cds.baseName.replace(".gz","").replace(".fa","").replace(".cds","")
-   species
+   species=cdna.baseName.replace(".gz","").replace(".fa","").replace(".cdna","")
    """
    #!/bin/bash
    source /usr/local/extras/Genomics/.bashrc
    source activate salmon
-   salmon index -t $cds -i ${species}_index
+   salmon index -t $cdna -i ${species}_index
    """	
 
 } 
@@ -90,10 +90,13 @@ ortho_cds = Channel.fromPath(params.cds)
 	
 process ortho_finder {
   
+   publishDir 'OrthoFinder', mode: 'copy', overwrite: true, pattern: 'OrthoFinder'
+
    input:
    file(cds) from ortho_cds
 
    output:
+   file("OrthoFinder") into ortho
 
    script:
    """
@@ -106,6 +109,7 @@ process ortho_finder {
    #~/software/OrthoFinder/orthofinder -f cds_new -d 
    source activate orthofinder
    orthofinder -f cds_new -d
+   mv cds_new/OrthoFinder . 
    """
 
 }
