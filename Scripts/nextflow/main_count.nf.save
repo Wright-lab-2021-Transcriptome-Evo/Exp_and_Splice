@@ -9,7 +9,7 @@ cdna_ch=Channel.fromPath(params.cdna + '/*.gz')
 cds_ch=Channel.fromPath(params.cds + '/*.gz')
 
 
-
+/*
 process salmon_index {
    //conda 'bioconda::salmon' 
 
@@ -33,7 +33,7 @@ process salmon_index {
 
 } 
 
-
+*/ 
 ref_ch=channel
     .fromPath(metadata)
     .splitCsv()
@@ -73,13 +73,12 @@ process merge {
     script:
     """
     #!/bin/bash
-    source /usr/local/extras/Genomics/.bashrc
     cat *.txt >> comp_read_counts.csv
     transform.R comp_read_counts.csv  
     """
 }
 
-
+/*
 process seqtk {
     
     input:
@@ -87,27 +86,24 @@ process seqtk {
     file('transform_data.csv') from transform_level
 
     output: 
-    tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") into post_seqtk
 
-
-    script:
+    script
     """
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
-    source activate seqtk     
+    
 
-    ss=\$(print_median_libsize.R transform_data.csv $species)    
-    if \$ss>0
+
+    if 
     then 
-	seqtk -s100 ${species}_${sid}_forward_paired.fastq.gz \$ss > ${species}_${sid}_forward_paired.fastq.gz
-    	seqtk -s100 ${species}_${sid}_reverse_paired.fastq.gz \$ss > ${species}_${sid}_reverse_paired.fastq.gz
-    #else
-#	mv ${species}_${sid}_forward_paired.fastq.gz ${sid}_forward_paired.fastq.gz
-#	mv ${species}_${sid}_reverse_paired.fastq.gz ${sid}_reverse_paired.fastq.gz
-    fi
+	
+    
+
     """
 
 }
+
+
 
 
 process salmon_quant {
@@ -116,8 +112,7 @@ process salmon_quant {
     publishDir 'salmon_quant', mode: 'copy', overwrite: true, pattern: '*salmon_out'
 
     input:
-    //tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz"), file("${species}_index") from trimmed1.combine(salmon_indexed, by:0).view()
-    tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") from post_seqtk, file("${species}_index") from post_seqtk.combine(salmon_indexed, by:0).view()   
+    tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz"), file("${species}_index") from trimmed1.combine(salmon_indexed, by:0).view()
 
     output:
     file("${species}_${sid}_salmon_out") into salmon_quant1
@@ -163,4 +158,4 @@ process ortho_finder {
 }
 
 
-
+*/
