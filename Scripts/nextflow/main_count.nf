@@ -1,11 +1,15 @@
 reads_ch = Channel.fromFilePairs(params.reads + '/**/*{1,2}.fastq.gz')
+reads_ch2 = Channel.fromPath(params.reads + '/**/*.fastq.gz')
+meta_path = Channel.fromPath(params.metadata)
 adapter=file(params.adapter)
 metadata=file(params.metadata)
+
+
 cdna_ch=Channel.fromPath(params.cdna + '/*.gz')
 cds_ch=Channel.fromPath(params.cds + '/*.gz')
 
 
-
+/*
 process salmon_index {
    //conda 'bioconda::salmon' 
 
@@ -28,13 +32,13 @@ process salmon_index {
    """	
 
 } 
- 
+
+*/ 
 ref_ch=channel
     .fromPath(metadata)
     .splitCsv()
     .map {row ->tuple(row[0],row[1])}
  
-
 
 process trim {
 
@@ -46,7 +50,7 @@ process trim {
     output:
     tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") into trimmed1
     tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") into trimmed2
-
+    file("${species}_${sid}_counts.txt") into merge
 
     script:
 
@@ -54,14 +58,26 @@ process trim {
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
     trimmomatic PE -phred33 $reads ${species}_${sid}_forward_paired.fastq.gz ${sid}_forward_unpaired.fastq.gz ${species}_${sid}_reverse_paired.fastq.gz ${sid}_reverse_unpaired.fastq.gz ILLUMINACLIP:$adapter:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:95
+    echo \$(echo \$(zcat ${species}_${sid}_forward_paired.fastq.gz|wc -l)/4|bc) ${species} ${sid} >> ${species}_${sid}_counts.txt
     """
 }
 
-Channel
-    .from(trimmed2)
-    .collect()
-    .view()
 
+process merge {
+    input:
+    file(counts) from merge.collect()
+    file('transform_data.csv') into transform_level
+
+    script:
+    """
+    #!/bin/bash
+    cat *.txt >> comp_read_counts.csv
+    transform.R comp_read_counts.csv  
+    """
+}
+
+
+/*
 process salmon_quant {
     //conda 'bioconda::salmon' 
 
@@ -114,3 +130,4 @@ process ortho_finder {
 }
 
 
+*/
