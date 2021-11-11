@@ -14,7 +14,7 @@ data$V4 = rep(0)
 data$V5 = rep(NA)
 
 for (s in 1:nrow(data)){
-  if (data[s,2] == names(nt)){
+  if (data[s,2] %in% names(nt)){
     data[s,4] = 1
     data[s,5] = median/data[s,1]
   }

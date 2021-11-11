@@ -1,6 +1,10 @@
 reads_ch = Channel.fromFilePairs(params.reads + '/**/*{1,2}.fastq.gz')
+reads_ch2 = Channel.fromPath(params.reads + '/**/*.fastq.gz')
+meta_path = Channel.fromPath(params.metadata)
 adapter=file(params.adapter)
 metadata=file(params.metadata)
+
+
 cdna_ch=Channel.fromPath(params.cdna + '/*.gz')
 cds_ch=Channel.fromPath(params.cds + '/*.gz')
 
@@ -9,6 +13,7 @@ cds_ch=Channel.fromPath(params.cds + '/*.gz')
 process salmon_index {
    //conda 'bioconda::salmon' 
 
+   tag {'salmon_index_' + species }
 
    publishDir 'salmon_index', mode: 'copy', overwrite: true, pattern: '*index*'
 	      
@@ -28,15 +33,22 @@ process salmon_index {
    """	
 
 } 
- 
+
+
 ref_ch=channel
     .fromPath(metadata)
     .splitCsv()
     .map {row ->tuple(row[0],row[1])}
  
 
-
 process trim {
+
+    cpus = 4
+    memory = '8 GB'
+    time = '2h'
+    
+    tag {'trim_' + species + '_' + sid }
+
 
     //publishDir 'paired', mode: 'copy', overwrite: true, pattern: '*paired*'
 
@@ -46,7 +58,7 @@ process trim {
     output:
     tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") into trimmed1
     tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") into trimmed2
-
+    file("${species}_${sid}_counts.txt") into merge
 
     script:
 
@@ -54,21 +66,122 @@ process trim {
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
     trimmomatic PE -phred33 $reads ${species}_${sid}_forward_paired.fastq.gz ${sid}_forward_unpaired.fastq.gz ${species}_${sid}_reverse_paired.fastq.gz ${sid}_reverse_unpaired.fastq.gz ILLUMINACLIP:$adapter:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:95
+    echo \$(echo \$(zcat ${species}_${sid}_forward_paired.fastq.gz|wc -l)/4|bc) ${species} ${sid} >> ${species}_${sid}_counts.txt
     """
 }
 
-Channel
-    .from(trimmed2)
-    .collect()
-    .view()
+
+process fastqc {
+
+    tag {'fastqc_' + species + '_' + sid }
+
+
+    input:
+    tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") from trimmed1
+
+    output:
+    file("fastqc_${species}_${sid}") into fastqced
+
+    script:
+    """
+    #!/bin/bash
+    source /usr/local/extras/Genomics/.bashrc
+    fastqc *.fastq.gz 
+    mkdir fastqc_${species}_${sid}
+    mv *_fastsqc* fastqc_${species}_${sid}
+    """
+
+}
+
+process multiqc {
+
+    publishDir 'fastqc', mode: 'copy', overwrite: true, pattern: '*multiqc*'
+
+    input:
+    file("fastqc_${species}_${sid}") from fastqced.collect()
+
+    output:
+    tuple file('multiqc_data'), file('multiqc_report.html') into multiqced
+
+    script:
+    """
+    #!/bin/bash
+    source /usr/local/extras/Genomics/.bashrc
+    mv fastqc_*/* .
+    multiqc .
+    """
+
+}
+
+
+process merge {
+    input:
+    file(counts) from merge.collect()
+
+    output:
+    file('transform_data.csv') into transform_level
+
+    script:
+    """
+    #!/bin/bash
+    source /usr/local/extras/Genomics/.bashrc
+    cat *.txt >> comp_read_counts.csv
+    transform.R comp_read_counts.csv  
+    """
+}
+
+
+process seqtk {
+       
+    tag {'seqtk_' + species + '_' + sid }
+    
+    cpus = 2
+    memory = '4 GB'
+    time = '2h'
+   
+    input:
+    tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") from trimmed2
+    file('transform_data.csv') from transform_level
+
+    output: 
+    tuple val(species), val(sid), file("${sid}_forward_paired.fastq.gz"), file("${sid}_reverse_paired.fastq.gz") into post_seqtk
+
+
+    script:
+    """
+    #!/bin/bash
+    source /usr/local/extras/Genomics/.bashrc
+    source activate seqtk     
+
+    q=\$(to_seqtk_or_not.R transform_data.csv $sid)
+    if [ \$q -gt 0 ]; then
+	echo 'running seqtk'
+	ss=\$(subsamp.R transform_data.csv $sid)
+	seqtk sample -s100 ${species}_${sid}_forward_paired.fastq.gz \$ss > ${sid}_forward_paired.fastq
+	seqtk sample -s100 ${species}_${sid}_reverse_paired.fastq.gz \$ss > ${sid}_reverse_paired.fastq
+	echo 'zipping'
+	gzip ${sid}_forward_paired.fastq
+	gzip ${sid}_reverse_paired.fastq
+    else
+	mv ${species}_${sid}_forward_paired.fastq.gz ${sid}_forward_paired.fastq.gz
+	mv ${species}_${sid}_reverse_paired.fastq.gz ${sid}_reverse_paired.fastq.gz
+	echo 'no need to run seqtk just renaming'
+    fi
+    """
+
+}
+
 
 process salmon_quant {
     //conda 'bioconda::salmon' 
 
+    tag {'salmon_quant_' + species + '_' + sid }
+
     publishDir 'salmon_quant', mode: 'copy', overwrite: true, pattern: '*salmon_out'
 
     input:
-    tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz"), file("${species}_index") from trimmed1.combine(salmon_indexed, by:0).view()
+    //tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz"), file("${species}_index") from trimmed1.combine(salmon_indexed, by:0).view()
+    tuple val(species), val(sid), file("${sid}_forward_paired.fastq.gz"), file("${sid}_reverse_paired.fastq.gz"), file("${species}_index") from post_seqtk.combine(salmon_indexed, by:0)   
 
     output:
     file("${species}_${sid}_salmon_out") into salmon_quant1
@@ -79,7 +192,7 @@ process salmon_quant {
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
     source activate salmon
-    salmon quant -i ${species}_index -l A -1 ${species}_${sid}_forward_paired.fastq.gz -2 ${species}_${sid}_reverse_paired.fastq.gz --validateMappings -o ${species}_${sid}_salmon_out --gcBias --seqBias
+    salmon quant -i ${species}_index -l A -1 ${sid}_forward_paired.fastq.gz -2 ${sid}_reverse_paired.fastq.gz --validateMappings -o ${species}_${sid}_salmon_out --gcBias --seqBias
     """
 
 }
@@ -89,6 +202,7 @@ ortho_cds = Channel.fromPath(params.cds)
 	
 process ortho_finder {
   
+
    publishDir 'OrthoFinder', mode: 'copy', overwrite: true, pattern: 'OrthoFinder'
 
    input:
@@ -112,5 +226,6 @@ process ortho_finder {
    """
 
 }
+
 
 
