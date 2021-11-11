@@ -73,8 +73,11 @@ process trim {
 
 process fastqc {
 
-    tag {'fastqc_' + species + '_' + sid }
+    cpus = 2
+    memory = '4 GB'
+    time = '2h'
 
+    tag {'fastqc_' + species + '_' + sid }
 
     input:
     tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") from trimmed1
@@ -88,7 +91,7 @@ process fastqc {
     source /usr/local/extras/Genomics/.bashrc
     fastqc *.fastq.gz 
     mkdir fastqc_${species}_${sid}
-    mv *_fastsqc* fastqc_${species}_${sid}
+    mv *_fastqc* fastqc_${species}_${sid}
     """
 
 }
