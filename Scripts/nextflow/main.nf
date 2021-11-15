@@ -65,7 +65,7 @@ process trim {
     """
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
-    trimmomatic PE -phred33 $reads ${species}_${sid}_forward_paired.fastq.gz ${sid}_forward_unpaired.fastq.gz ${species}_${sid}_reverse_paired.fastq.gz ${sid}_reverse_unpaired.fastq.gz ILLUMINACLIP:$adapter:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:95
+    trimmomatic PE -phred33 $reads ${species}_${sid}_forward_paired.fastq.gz ${sid}_forward_unpaired.fastq.gz ${species}_${sid}_reverse_paired.fastq.gz ${sid}_reverse_unpaired.fastq.gz ILLUMINACLIP:$adapter:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:95 CROP:95
     echo \$(echo \$(zcat ${species}_${sid}_forward_paired.fastq.gz|wc -l)/4|bc) ${species} ${sid} >> ${species}_${sid}_counts.txt
     """
 }
@@ -73,8 +73,8 @@ process trim {
 
 process fastqc {
 
-    cpus = 2
-    memory = '4 GB'
+    cpus = 4
+    memory = '8 GB'
     time = '2h'
 
     tag {'fastqc_' + species + '_' + sid }
@@ -83,25 +83,29 @@ process fastqc {
     tuple val(species), val(sid), file("${species}_${sid}_forward_paired.fastq.gz"), file("${species}_${sid}_reverse_paired.fastq.gz") from trimmed1
 
     output:
-    file("fastqc_${species}_${sid}") into fastqced
+    file("fastqc_${sid}") into fastqced
 
     script:
     """
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
     fastqc *.fastq.gz 
-    mkdir fastqc_${species}_${sid}
-    mv *_fastqc* fastqc_${species}_${sid}
+    mkdir fastqc_${sid}
+    mv *_fastqc* fastqc_${sid}
     """
 
 }
 
 process multiqc {
 
+    cpus = 2
+    memory = '4 GB'
+    time = '2h'
+
     publishDir 'fastqc', mode: 'copy', overwrite: true, pattern: '*multiqc*'
 
     input:
-    file("fastqc_${species}_${sid}") from fastqced.collect()
+    file("fastqc_${sid}") from fastqced.collect()
 
     output:
     tuple file('multiqc_data'), file('multiqc_report.html') into multiqced
@@ -110,7 +114,7 @@ process multiqc {
     """
     #!/bin/bash
     source /usr/local/extras/Genomics/.bashrc
-    mv fastqc_*/* .
+    cp fastqc_*/* .
     multiqc .
     """
 
@@ -118,6 +122,12 @@ process multiqc {
 
 
 process merge {
+
+    cpus = 1
+    memory = '2 GB'
+    time = '1h'
+
+
     input:
     file(counts) from merge.collect()
 
@@ -179,6 +189,10 @@ process salmon_quant {
     //conda 'bioconda::salmon' 
 
     tag {'salmon_quant_' + species + '_' + sid }
+
+    cpus = 2
+    memory = '4 GB'
+    time = '2h'
 
     publishDir 'salmon_quant', mode: 'copy', overwrite: true, pattern: '*salmon_out'
 
