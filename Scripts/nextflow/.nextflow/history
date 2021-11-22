@@ -1,0 +1,1 @@
+2021-11-16 10:56:33	4.2s	intergalactic_meucci	ERR	f6a838ba520d357fe969e8576174d925	8d9704cc-34ad-40ca-aa0a-fea0ef4d3342	nextflow run /home/bop20pp/software/Exp_and_Splice/Scripts/nextflow/main.nf --cds cds --adapter adapters.fa --reads reads --metadata project_data.csv --cdna cdna -resume -bg
