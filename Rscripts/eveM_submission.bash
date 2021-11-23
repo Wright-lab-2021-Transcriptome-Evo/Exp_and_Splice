@@ -1,0 +1,1 @@
+qsub submission.sh /home/bop20pp/software/Exp_and_Splice/Rscripts/fit_eve.R ~/software/Exp_and_Splice/data/TreeAnnotator_best_tree.nex ~/software/Exp_and_Splice/data/log_rpkm_G.csv ~/software/Exp_and_Splice/data/metadata.csv M G /fastdata/bop20pp/wdir/
