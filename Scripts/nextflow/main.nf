@@ -248,7 +248,7 @@ process ortho_finder {
 
 }
 
-/*
+
 
 process index_hisat2 {
 
@@ -300,6 +300,8 @@ process allignment_hisat2 {
     //clusterOptions = { '-P ressexcon' }
 
 
+    publishDir 'hisat_allign', mode: 'copy', overwrite: true, pattern: '*.bam'
+
     input:
     tuple val(species), val(sid), file("${sid}_forward_paired.fastq.gz"), file("${sid}_reverse_paired.fastq.gz"), file("hisat_index_${species}") from post_seqtk2.combine(hisat_indexed, by: 0)
 
@@ -322,5 +324,3 @@ process allignment_hisat2 {
 }
 
 
-
-*/

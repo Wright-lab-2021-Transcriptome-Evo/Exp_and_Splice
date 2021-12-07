@@ -35,9 +35,9 @@ xdata = exp_data[start:stop,metadata$sample]
 print(start)
 print(stop)
 n_species <- length(unique(metadata$species))
-xdata <-xdata[1:2,]
+
 #### FUNCTIONS ----
-fit_ind_theta <- function(xdata, info, tree, n=10000, error_no_error = "none"){
+fit_ind_theta <- function(xdata, info, tree, n=10000){
   p <- list()
   expression_means <- matrix(nrow = nrow(xdata), ncol = length(unique(info$ensembl_datasets)))
   rownames(expression_means) <- rownames(xdata)
@@ -60,8 +60,8 @@ fit_ind_theta <- function(xdata, info, tree, n=10000, error_no_error = "none"){
     trait_df[,3:4] <- list(expression_means[i,], expression_se[i,])
     names(reg) <- trait_df$Genus_species
     tree<-make.simmap(tree,reg)
-    fitBM_var<-OUwie(tree,trait_df,model="BM1",simmap.tree=TRUE, mserr= error_no_error, ub = n, quiet = T)
-    fitOU_var<-OUwie(tree,trait_df,model="OU1",simmap.tree=TRUE, mserr = error_no_error, ub = n, quiet = T)
+    fitBM_var<-OUwie(tree,trait_df,model="BM1",simmap.tree=TRUE, mserr= "known", ub = n, quiet = T)
+    fitOU_var<-OUwie(tree,trait_df,model="OU1",simmap.tree=TRUE, mserr = "known", ub = n, quiet = T)
     pi <- list(fitBM_var, fitOU_var)
     names(pi) <- c("fitBM_var", "fitOU_var")
     
@@ -71,7 +71,7 @@ fit_ind_theta <- function(xdata, info, tree, n=10000, error_no_error = "none"){
       reg2 = trait_df$Reg
       names(reg2) = trait_df$Genus_species
       tree<-make.simmap(tree,reg2)
-      fitOU_indtheta<-OUwie(tree,trait_df,model=c("OUM"), simmap.tree = TRUE, mserr = error_no_error, quiet = T)
+      fitOU_indtheta<-OUwie(tree,trait_df,model=c("OUM"), simmap.tree = TRUE, mserr = "known", quiet = T)
       new_names <- c(names(pi), paste("indtheta", colnames(expression_means)[sp], sep = "_"))
       pi <- c(pi, list(fitOU_indtheta))
       names(pi) <- new_names
@@ -84,7 +84,7 @@ fit_ind_theta <- function(xdata, info, tree, n=10000, error_no_error = "none"){
   return(p)
 }
 
-p <- fit_ind_theta(xdata, metadata, tree, n=10000, error_no_error = "none")
+p <- fit_ind_theta(xdata, metadata, tree, n=10000)
 save(p, file = paste(out, "/ouwie_", start, "_", stop, s, t, ".rDATA", sep = ""))
 
 
